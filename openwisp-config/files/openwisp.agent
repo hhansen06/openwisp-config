@@ -183,7 +183,12 @@ register() {
 
 # gets checksum from controller
 get_checksum() {
-	$($FETCH_COMMAND -i $CHECKSUM_URL > $1)
+
+	local brlanip=$(ifconfig br-lan | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
+	local assocstations=$(iw dev wlan0 station dump)
+	
+	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" \
+	--data-urlencode assocstations="$assocstations" > $1)
 	local exit_code=$?
 
 	if [ "$exit_code" != "0" ]; then
