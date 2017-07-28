@@ -140,6 +140,7 @@ register() {
 	                 --data-urlencode secret="$SHARED_SECRET" \
 	                 --data-urlencode name="$hostname" \
 	                 --data-urlencode mac_address="$macaddr" \
+			 --data-urlencode bssid="$bssid" \
 	                 --data-urlencode tags="$tags" \
 	                 --data-urlencode model="$model" \
 	                 --data-urlencode os="$os" \
