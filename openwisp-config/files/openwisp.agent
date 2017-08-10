@@ -483,9 +483,8 @@ FIRMWARE_URL="$BASEURL/firmware/$UUID/?key=$KEY"
 
 while true
 do
-	
-	configuration_changed
 	check_firmware
+	configuration_changed
 	
 	if [ "$?" == "1" ]; then
 		update_configuration
