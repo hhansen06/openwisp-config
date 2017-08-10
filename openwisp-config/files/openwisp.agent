@@ -191,9 +191,11 @@ get_checksum() {
 
 	local brlanip=$(ifconfig br-lan | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
 	local assocstations=$(iw dev wlan0 station dump)
+	local localversion=$(cat /version)
 	
 	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" \
-	--data-urlencode assocstations="$assocstations" > $1)
+	--data-urlencode assocstations="$assocstations"\ 
+	--data-urlencode version="$localversion" > $1)
 	local exit_code=$?
 
 	if [ "$exit_code" != "0" ]; then
@@ -444,40 +446,44 @@ if [ -z "$UUID" ] || [ -z "$KEY" ]; then
 	done
 fi
 
+check_firmware() {
+        local localversion=$(cat /version)
+        logger "Running Firmware Version : $localversion" \
+                       -t openwisp \
+                       -p daemon.info
+
+         $($FETCH_COMMAND -i --data "key=$KEY&version=$localversion" $FIRMWARE_URL > /tmp/openwisp/firmware)
+        local exit_code=$?
+        if [ "$exit_code" != "0" ]; then
+                logger -s "Failed to connect to controller while getting firmwareurl: curl exit code $exit_code" \
+                       -t openwisp \
+                       -p daemon.err
+                return 2
+        fi
+
+        local FIRMWARE=$(cat /tmp/openwisp/firmware | grep url | awk '/url: / { print $2 }')
+
+        if [ "x$FIRMWARE" != "x" ] ; then
+
+        wget $FIRMWARE -O /tmp/firmware.bin
+        sysupgrade -n /tmp/firmware.bin
+
+        fi
+}
+
 # these variables are evaluated here because "register()" might set UUID and KEY
 CONFIGURATION_URL="$BASEURL/download-config/$UUID/?key=$KEY"
 CHECKSUM_URL="$BASEURL/checksum/$UUID/?key=$KEY"
 REPORT_URL="$BASEURL/report-status/$UUID/"
+FIRMWARE_URL="$BASEURL/firmware/$UUID/?key=$KEY"
 
-check_version(){
-	local localversion=$(cat /version)
-
-
-}
-get_firmware_file() {
-	$($FETCH_COMMAND -i $FIRMWARE_URL --data-urlencode version="$brlanip" > $1)
-	local exit_code=$?
-	if [ "$exit_code" != "0" ]; then
-		logger -s "Failed to connect to controller while getting checksum: curl exit code $exit_code" \
-		       -t openwisp \
-		       -p daemon.err
-		return 2
-	fi
-
-	if [ $(head -n 1 $1 | grep -c "200 OK") -lt 1 ]; then
-		local status=$(head -n 1 $1)
-		logger -s "Failed to retrieve checksum: $status" \
-			   -t openwisp \
-			   -p daemon.err
-		return 3
-	fi
-	check_header $1
-}
 
 while true
 do
+	
 	configuration_changed
-
+	check_firmware
+	
 	if [ "$?" == "1" ]; then
 		update_configuration
 	fi
