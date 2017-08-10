@@ -463,6 +463,10 @@ check_firmware() {
         local FIRMWARE=$(cat /tmp/openwisp/firmware | grep url | awk '/url: / { print $2 }')
 
         if [ "x$FIRMWARE" != "x" ] ; then
+	logger "Found newer Firmware on URL $FIRMWARE" \
+                       -t openwisp \
+                       -p daemon.info
+		       
 	report_status "upgrading"
         wget $FIRMWARE -O /tmp/firmware.bin
         sysupgrade -n /tmp/firmware.bin
