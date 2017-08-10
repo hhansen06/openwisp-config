@@ -449,6 +449,31 @@ CONFIGURATION_URL="$BASEURL/download-config/$UUID/?key=$KEY"
 CHECKSUM_URL="$BASEURL/checksum/$UUID/?key=$KEY"
 REPORT_URL="$BASEURL/report-status/$UUID/"
 
+check_version(){
+	local localversion=$(cat /version)
+
+
+}
+get_firmware_file() {
+	$($FETCH_COMMAND -i $FIRMWARE_URL --data-urlencode version="$brlanip" > $1)
+	local exit_code=$?
+	if [ "$exit_code" != "0" ]; then
+		logger -s "Failed to connect to controller while getting checksum: curl exit code $exit_code" \
+		       -t openwisp \
+		       -p daemon.err
+		return 2
+	fi
+
+	if [ $(head -n 1 $1 | grep -c "200 OK") -lt 1 ]; then
+		local status=$(head -n 1 $1)
+		logger -s "Failed to retrieve checksum: $status" \
+			   -t openwisp \
+			   -p daemon.err
+		return 3
+	fi
+	check_header $1
+}
+
 while true
 do
 	configuration_changed
