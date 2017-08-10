@@ -194,8 +194,7 @@ get_checksum() {
 	local localversion=$(cat /version)
 	
 	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" \
-	--data-urlencode assocstations="$assocstations"\ 
-	--data-urlencode version="$localversion" > $1)
+	--data-urlencode assocstations="$assocstations" > $1)
 	local exit_code=$?
 
 	if [ "$exit_code" != "0" ]; then
