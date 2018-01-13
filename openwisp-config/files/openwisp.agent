@@ -263,11 +263,11 @@ apply_configuration() {
 		return 1
 	fi
 	# restore unmanaged configurations
-	#/usr/sbin/openwisp-restore-unmanaged
+	/usr/sbin/openwisp-restore-unmanaged
 	# call pre-reload-hook
-	#pre_reload_hook
+	pre_reload_hook
 	# reload changes and wait $sleep_time
-	#/usr/sbin/openwisp-reload-config
+	/usr/sbin/openwisp-reload-config
 	sleep $sleep_time
 }
 
