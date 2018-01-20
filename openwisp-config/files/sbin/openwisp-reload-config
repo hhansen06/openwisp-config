@@ -18,7 +18,7 @@ if [ -f $MD5FILE ]; then
 		logger_msg="Service $service has been reloaded via procd/ubus"
 		# if service is not managed via procd, do explicit reload
 		if [ -f $initd ] && [ $service_triggers -lt 1 ]; then
-			$initd reload
+			$initd restart
 			logger_msg="Service $service has been reloaded via init.d script"
 		fi
 		# log which service has been reloaded and how
