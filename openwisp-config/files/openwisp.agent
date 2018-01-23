@@ -477,6 +477,7 @@ check_firmware() {
 		report_status "updating"
 		sysupgrade -n /tmp/firmware.bin
         fi
+	fi
 }
 
 # these variables are evaluated here because "register()" might set UUID and KEY
