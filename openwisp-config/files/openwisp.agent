@@ -462,7 +462,7 @@ check_firmware() {
 	
         local FIRMWARE=$(cat /tmp/openwisp/firmware | grep url | awk '/url: / { print $2 }')
 	local HASH=$(cat /tmp/openwisp/firmware | grep hash | awk '/hash: / { print $2 }')
-	check_header /tmp/openwisp/version
+	check_header /tmp/openwisp/firmware
 
         if [ "$FIRMWARE" != "x" ] ; then
 	logger "Found newer Firmware on URL $FIRMWARE" \
