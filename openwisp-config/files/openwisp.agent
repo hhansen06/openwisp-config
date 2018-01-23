@@ -459,18 +459,23 @@ check_firmware() {
                        -p daemon.err
                 return 2
         fi
-
+	
         local FIRMWARE=$(cat /tmp/openwisp/firmware | grep url | awk '/url: / { print $2 }')
+	local HASH=$(cat /tmp/openwisp/firmware | grep hash | awk '/hash: / { print $2 }')
+	check_header /tmp/openwisp/version
 
-        if [ "x$FIRMWARE" != "x" ] ; then
+        if [ "$FIRMWARE" != "x" ] ; then
 	logger "Found newer Firmware on URL $FIRMWARE" \
                        -t openwisp \
                        -p daemon.info
 		       
-	report_status "upgrading"
-        wget $FIRMWARE -O /tmp/firmware.bin
-        sysupgrade -n /tmp/firmware.bin
+	report_status "downloading"
+	wget $FIRMWARE -O /tmp/firmware.bin
+	local lo_hash=$(echo /tmp/firmware.bin | md5sum | awk '{print $1}')
 
+	if($lo_hash == $HASH) then
+		report_status "updating"
+		sysupgrade -n /tmp/firmware.bin
         fi
 }
 
