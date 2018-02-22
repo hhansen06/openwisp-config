@@ -188,12 +188,12 @@ register() {
 
 # gets checksum from controller
 get_checksum() {
-
+	local fastd=$(ifconfig fastd0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
 	local brlanip=$(ifconfig br-lan | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
 	local assocstations=$(iw dev wlan0 station dump)
 	local localversion=$(cat /version)
 	
-	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" \
+	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" fastd="$fastd" \
 	--data-urlencode assocstations="$assocstations" > $1)
 	local exit_code=$?
 
@@ -486,8 +486,8 @@ CHECKSUM_URL="$BASEURL/checksum/$UUID/?key=$KEY"
 REPORT_URL="$BASEURL/report-status/$UUID/"
 FIRMWARE_URL="$BASEURL/firmware/$UUID/?key=$KEY"
 
-
-while true
+i="0"
+while [ $i -lt 4 ]
 do
 	check_firmware
 	configuration_changed
@@ -496,5 +496,7 @@ do
 		update_configuration
 	fi
 
-	sleep $INTERVAL
+	sleep 10
+	
+	i=$[$i+1]
 done
