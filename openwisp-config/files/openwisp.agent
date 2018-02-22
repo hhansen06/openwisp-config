@@ -193,7 +193,7 @@ get_checksum() {
 	local assocstations=$(iw dev wlan0 station dump)
 	local localversion=$(cat /version)
 	
-	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" fastd="$fastd" \
+	$($FETCH_COMMAND -i $CHECKSUM_URL --data-urlencode brlanip="$brlanip" --data-urlencode fastd="$fastd" \
 	--data-urlencode assocstations="$assocstations" > $1)
 	local exit_code=$?
 
