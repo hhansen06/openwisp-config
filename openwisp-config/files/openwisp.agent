@@ -476,6 +476,8 @@ check_firmware() {
 	if($lo_hash == $HASH) then
 		report_status "updating"
 		sysupgrade -n /tmp/firmware.bin
+	else
+	report_status "checksumerror"
         fi
 	fi
 }
